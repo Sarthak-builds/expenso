@@ -30,8 +30,12 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# env files — NEVER commit real values. This repo is PUBLIC.
+# EXPO_PUBLIC_* values are inlined into the JS bundle at build time and are
+# extractable from any distributed build. See docs/adr/0004-credentials-and-secrets.md
+.env
+.env.*
+!.env.example
 
 # typescript
 *.tsbuildinfo
