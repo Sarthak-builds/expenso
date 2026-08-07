@@ -1,0 +1,28 @@
+# pnpm 11 reads settings from THIS file, not .npmrc. Setting `node-linker` in
+# .npmrc silently does nothing — verify with `pnpm config get node-linker`.
+# See docs/adr/0009-package-manager-pnpm.md
+
+# React Native autolinking resolves native module paths on disk from Gradle and
+# CocoaPods, which do not follow pnpm's symlinked layout. Metro also fails to
+# resolve subpath exports (e.g. react/compiler-runtime) through the symlinks.
+# A hoisted, npm-style node_modules is required. Do not remove.
+nodeLinker: hoisted
+
+# Expo and RN packages routinely declare loose or missing peer ranges.
+strictPeerDependencies: false
+
+# React Native ships large tarballs; the default fetch timeout fails mid-install
+# on slower links.
+fetchTimeout: 600000
+fetchRetries: 5
+
+minimumReleaseAgeExclude:
+  - '@expo/cli@57.0.13'
+  - '@expo/config-plugins@57.0.7'
+  - babel-preset-expo@57.0.6
+  - expo-asset@57.0.9
+  - expo-file-system@57.0.2
+  - expo-modules-core@57.0.10
+  - expo@57.0.11
+  - expo-router@57.0.11
+  - expo-symbols@57.0.2

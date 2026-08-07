@@ -43,3 +43,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# local bundle smoke-test output
+.expo-export-test/

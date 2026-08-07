@@ -48,12 +48,20 @@ v5's ecosystem, so v4 is the coherent pairing.
 live in exactly one file. RNR gives accessible, well-tested primitives instead
 of hand-rolled ones.
 
-**Bad — and this is the real cost.** RNR 0.7.1 (March 2026) predates Expo SDK 57
+**Compatibility risk — resolved.** RNR 0.7.1 (March 2026) predates Expo SDK 57
 and RN 0.86 (June 2026), and NativeWind v4 depends on
-`react-native-css-interop@0.2.6` whose behaviour on RN 0.86's new architecture
-is **unverified**. This must be smoke-tested immediately after install, before
-any UI is built on top of it. If it fails, the fallback is NativeWind v5 preview
-— accepting pre-release risk in exchange for current-RN support.
+`react-native-css-interop@0.2.6`, whose behaviour on RN 0.86's new architecture
+was unverified when this was written.
+
+Verified 2026-08-07 with a full Android Metro bundle (`expo export`): **1,575
+modules bundled successfully** with React Compiler enabled, and the compiled
+output contains both the Geist PostScript names (`Geist_400Regular`,
+`Geist_600SemiBold`, `Geist_700Bold`) and the `#0070f3` token — confirming
+`tailwind.config.js` is consumed end-to-end. The v5-preview fallback is not
+needed.
+
+Re-run `pnpm expo export --platform android` after any NativeWind, Tailwind or
+RN version bump; this pairing is not covered by anyone else's CI.
 
 **Also.** NativeWind pulls in `react-native-reanimated` as a peer, reversing an
 earlier decision not to install it. It is now a required dependency, not an

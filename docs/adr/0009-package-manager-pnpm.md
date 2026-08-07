@@ -19,12 +19,21 @@ play, this would break the build immediately.
 
 ## Decision
 
-Use pnpm, with `.npmrc`:
+Use pnpm, configured in **`pnpm-workspace.yaml`**:
 
+```yaml
+nodeLinker: hoisted
+strictPeerDependencies: false
+fetchTimeout: 600000
+fetchRetries: 5
 ```
-node-linker=hoisted
-strict-peer-dependencies=false
-```
+
+> **pnpm 11 does not read these from `.npmrc`.** This was set in `.npmrc` first
+> and silently ignored — `pnpm config get node-linker` returned `undefined`, the
+> install produced a fully symlinked tree, and Metro then failed with
+> `Unable to resolve module react/compiler-runtime` even though the file existed
+> and was correctly exported. Verify with `pnpm config get node-linker`; it must
+> print `hoisted`.
 
 `node-linker=hoisted` produces an npm-style flat `node_modules`, keeping
 autolinking working while retaining pnpm's fast, deduplicated global store.
@@ -45,9 +54,9 @@ and a lockfile that is far easier to read in review than `package-lock.json`.
 package can import something it never declared, exactly as with npm. That is the
 price of native builds working, and it is not optional.
 
-**Trap.** If `.npmrc` is ever deleted or the store is reinstalled without it,
-builds fail with confusing "module not found" errors at native link time rather
-than at install time. The file carries a comment saying so.
+**Trap.** If `nodeLinker: hoisted` is ever removed, failures appear as confusing
+"module not found" errors at bundle or native-link time rather than at install
+time. Both `pnpm-workspace.yaml` and `.npmrc` carry comments saying so.
 
 **Scripts.** Environment variants are driven by `APP_VARIANT`, read in
 `app.config.ts`:
