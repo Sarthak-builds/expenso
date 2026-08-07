@@ -11,10 +11,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // --- Primitive layer: raw Geist values -------------------------------
         // Geist runs true black on true white — restraint is the point.
-        background: '#ffffff',
-        foreground: '#000000',
-
         // Accents: 1 is the faintest fill, 5 is secondary text.
         accents: {
           1: '#fafafa',
@@ -31,8 +29,26 @@ module.exports = {
         blue: { DEFAULT: '#0070f3', dark: '#0761d1' },
         red: { DEFAULT: '#ee0000', dark: '#c50000' },
         amber: { DEFAULT: '#f5a623', dark: '#ab570a' },
-        green: { DEFAULT: '#0070f3', dark: '#0761d1' },
         violet: { DEFAULT: '#7928ca', dark: '#4c2889' },
+
+        // --- Semantic layer --------------------------------------------------
+        // React Native Reusables components are written against shadcn's
+        // semantic token names. Mapping them onto Geist values here is what
+        // makes RNR render as Geist rather than as default shadcn.
+        // Never use these names for new app code — prefer the primitives above.
+        background: '#ffffff',
+        foreground: '#000000',
+        card: { DEFAULT: '#ffffff', foreground: '#000000' },
+        popover: { DEFAULT: '#ffffff', foreground: '#000000' },
+        // Geist's primary action is a solid black button, not a coloured one.
+        primary: { DEFAULT: '#000000', foreground: '#ffffff' },
+        secondary: { DEFAULT: '#fafafa', foreground: '#000000' },
+        muted: { DEFAULT: '#fafafa', foreground: '#666666' },
+        accent: { DEFAULT: '#fafafa', foreground: '#000000' },
+        destructive: { DEFAULT: '#ee0000', foreground: '#ffffff' },
+        border: '#eaeaea',
+        input: '#eaeaea',
+        ring: '#0070f3',
       },
       fontFamily: {
         // PostScript names — 'Geist' alone silently falls back on Android.
