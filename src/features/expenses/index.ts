@@ -9,6 +9,7 @@ export { DashboardScreen } from './screens/dashboard-screen';
 
 export { addExpense, clearAllExpenses, countAll, migrateIfNeeded, repair } from './data/expense.repository';
 export { buildSpendDigest } from './data/digest';
+export { useExpenseCount } from './hooks/useExpenseCount';
 export { CATEGORIES, CATEGORY_LIST, categoryMeta } from './model/categories';
 export { useRevision } from './store/expenses.store';
 
