@@ -6,7 +6,10 @@ import { Platform, Text as RNText, type Role } from 'react-native';
 
 const textVariants = cva(
   cn(
-    'text-foreground text-base',
+    // `font-sans` is load-bearing: without an explicit family every Text falls
+    // back to Roboto/SF, because `font-medium` and friends only carry a weight
+    // until a family is also present. See docs/adr/0005-design-system.md
+    'text-foreground font-sans text-base',
     Platform.select({
       web: 'select-text',
     })

@@ -1,6 +1,12 @@
+const { base, accents, blue, red, amber, violet, teal, pink } = require('./src/lib/theme/palette');
+
 /**
  * Vercel Geist design tokens — the single source of design values.
  * No raw hex or magic spacing numbers anywhere else in the codebase.
+ *
+ * The hex values themselves live in `src/lib/theme/palette.js`, because chart
+ * SVG fills and the native tab bar need them at runtime where a `className`
+ * cannot reach. This file maps those primitives onto Tailwind's scale.
  * See docs/adr/0005-design-system.md
  *
  * @type {import('tailwindcss').Config}
@@ -11,44 +17,33 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // --- Primitive layer: raw Geist values -------------------------------
-        // Geist runs true black on true white — restraint is the point.
-        // Accents: 1 is the faintest fill, 5 is secondary text.
-        accents: {
-          1: '#fafafa',
-          2: '#eaeaea',
-          3: '#999999',
-          4: '#888888',
-          5: '#666666',
-          6: '#444444',
-          7: '#333333',
-          8: '#111111',
-        },
-
-        // One electric blue. Links, focus, the single chart accent.
-        blue: { DEFAULT: '#0070f3', dark: '#0761d1' },
-        red: { DEFAULT: '#ee0000', dark: '#c50000' },
-        amber: { DEFAULT: '#f5a623', dark: '#ab570a' },
-        violet: { DEFAULT: '#7928ca', dark: '#4c2889' },
+        // --- Primitive layer -------------------------------------------------
+        accents,
+        blue,
+        red,
+        amber,
+        violet,
+        teal,
+        pink,
 
         // --- Semantic layer --------------------------------------------------
         // React Native Reusables components are written against shadcn's
         // semantic token names. Mapping them onto Geist values here is what
         // makes RNR render as Geist rather than as default shadcn.
         // Never use these names for new app code — prefer the primitives above.
-        background: '#ffffff',
-        foreground: '#000000',
-        card: { DEFAULT: '#ffffff', foreground: '#000000' },
-        popover: { DEFAULT: '#ffffff', foreground: '#000000' },
+        background: base.white,
+        foreground: base.black,
+        card: { DEFAULT: base.white, foreground: base.black },
+        popover: { DEFAULT: base.white, foreground: base.black },
         // Geist's primary action is a solid black button, not a coloured one.
-        primary: { DEFAULT: '#000000', foreground: '#ffffff' },
-        secondary: { DEFAULT: '#fafafa', foreground: '#000000' },
-        muted: { DEFAULT: '#fafafa', foreground: '#666666' },
-        accent: { DEFAULT: '#fafafa', foreground: '#000000' },
-        destructive: { DEFAULT: '#ee0000', foreground: '#ffffff' },
-        border: '#eaeaea',
-        input: '#eaeaea',
-        ring: '#0070f3',
+        primary: { DEFAULT: base.black, foreground: base.white },
+        secondary: { DEFAULT: accents[1], foreground: base.black },
+        muted: { DEFAULT: accents[1], foreground: accents[5] },
+        accent: { DEFAULT: accents[1], foreground: base.black },
+        destructive: { DEFAULT: red.DEFAULT, foreground: base.white },
+        border: accents[2],
+        input: accents[2],
+        ring: blue.DEFAULT,
       },
       fontFamily: {
         // PostScript names — 'Geist' alone silently falls back on Android.
