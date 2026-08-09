@@ -29,12 +29,20 @@ future work would otherwise have to reverse-engineer.
 Feature-based, with a domain-free component library beneath it.
 
 ```
-app/                 expo-router routes ONLY, <=20 lines each
-src/features/        auth, expenses, chat, settings
-src/components/ui/   atoms — domain-free, cva variants
-src/lib/             theme, strings, storage, ai, format, env, query
-docs/adr/            architecture decision records
+app/                      expo-router routes ONLY, <=20 lines each
+src/features/             auth, expenses, chat, settings
+src/components/ui/        atoms — RNR primitives, cva variants
+src/components/molecules/ compose atoms; one job each; domain-free
+src/components/organisms/ compose molecules; domain-free (schema-form)
+src/components/charts/    domain-free chart organisms (ADR 0008 fixes this path)
+src/lib/                  theme, strings, storage, ai, format, env, query
+docs/adr/                 architecture decision records
 ```
+
+Inside a feature: `model/` types, `data/` repository and derivations,
+`store/` zustand, `services/` side effects, `schema/` UI schemas,
+`hooks/`, `components/` domain organisms, `screens/` templates.
+See ADR 0011 for how the atomic layers and the domain-freedom rule interact.
 
 **Dependency direction is one-way and enforced:**
 

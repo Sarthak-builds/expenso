@@ -19,3 +19,4 @@ rather than edit: keep the original and mark it `Superseded by ADR-XXXX`.
 | [0008](0008-charts.md) | Hand-rolled react-native-svg charts | Accepted |
 | [0009](0009-package-manager-pnpm.md) | pnpm with `node-linker=hoisted` | Accepted |
 | [0010](0010-branching-and-commits.md) | staging trunk, feature branches, ~300-line commits | Accepted |
+| [0011](0011-component-layers-and-schema-ui.md) | Atomic component layers; forms declared as data | Accepted |

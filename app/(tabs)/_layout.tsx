@@ -6,9 +6,13 @@ import { strings } from '@/lib/strings';
 /**
  * The bottom bar, using the real platform control.
  *
- * `sf` for iOS and `md` for Android: both are built into the OS, so the tabs
- * get correct, resolution-independent, accessibility-aware icons with no asset
- * pipeline and no vector-icon font to ship.
+ * `sf` for iOS and `md` for Android. SF Symbols are free — they are part of the
+ * OS. `md` is NOT: it resolves through `expo-symbols`, which bundles a 962KB
+ * Material Symbols font (measured with `expo export`, ~15% of the Android
+ * bundle). That is the price of correct Material 3 icons without an asset
+ * pipeline, and it is worth paying here; the alternative is shipping four PNGs
+ * at three densities each, or falling back to the framework's Holo-era
+ * drawables. Revisit if bundle size ever becomes a real constraint.
  *
  * Four tabs — `ui-ux-pro-max` puts the ceiling at five. See ADR 0006.
  */
