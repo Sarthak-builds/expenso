@@ -1,0 +1,103 @@
+import * as React from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { Check } from 'lucide-react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { SchemaForm, useSchemaForm } from '@/components/organisms/schema-form';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { parseAmountToMinor } from '@/lib/format';
+import { strings } from '@/lib/strings';
+import { motion } from '@/lib/theme';
+
+import { addExpense } from '../data/expense.repository';
+import { addExpenseInitialValues, addExpenseSchema } from '../schema/add-expense.schema';
+import { isCategoryId } from '../model/types';
+
+const CONFIRMATION_MS = 1800;
+
+/**
+ * Add an expense.
+ *
+ * Saving resets the form and stays put rather than navigating away. This screen
+ * is used several times in a row — three groceries and an auto fare in one
+ * sitting — and bouncing to the dashboard after each would cost a tab tap to
+ * get back. The confirmation is what tells the user it worked.
+ */
+export function AddExpenseScreen() {
+  const insets = useSafeAreaInsets();
+  const [initialValues, setInitialValues] = React.useState(addExpenseInitialValues);
+  const form = useSchemaForm({ schema: addExpenseSchema, initialValues });
+  const [saved, setSaved] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!saved) return;
+    const timer = setTimeout(() => setSaved(false), CONFIRMATION_MS);
+    return () => clearTimeout(timer);
+  }, [saved]);
+
+  const handleSubmit = React.useCallback(() => {
+    const values = form.submit();
+    if (!values) return;
+
+    // The schema guarantees shape; these two guards cover the values it cannot
+    // express. `amount` passed the rule, so the parse is a formality — but a
+    // formality that keeps a NaN out of a stored record.
+    const amountMinor = parseAmountToMinor(values.amount ?? '');
+    const categoryId = values.categoryId;
+    if (amountMinor === null || !isCategoryId(categoryId)) return;
+
+    const note = (values.note ?? '').trim();
+    addExpense({
+      label: (values.label ?? '').trim(),
+      amountMinor,
+      categoryId,
+      day: values.day ?? '',
+      source: 'manual',
+      ...(note ? { note } : {}),
+    });
+
+    // A fresh `day` matters: the form may have been open across midnight.
+    const next = addExpenseInitialValues();
+    setInitialValues(next);
+    form.reset(next);
+    setSaved(true);
+  }, [form]);
+
+  return (
+    <KeyboardAvoidingView
+      className="flex-1 bg-background"
+      behavior={Platform.select({ ios: 'padding', default: undefined })}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
+        contentContainerClassName="gap-6 px-4 pt-4">
+        <SchemaForm
+          schema={addExpenseSchema}
+          values={form.values}
+          errors={form.errors}
+          setValue={form.setValue}
+        />
+
+        <View className="gap-3">
+          <Button size="lg" onPress={handleSubmit}>
+            <Text>{strings.addExpense.submit}</Text>
+          </Button>
+
+          {saved ? (
+            <Animated.View
+              entering={FadeIn.duration(motion.fast)}
+              exiting={FadeOut.duration(motion.base)}
+              className="flex-row items-center justify-center gap-2">
+              <Icon as={Check} size={14} className="text-blue" />
+              <Text className="text-copy-14 text-blue">{strings.addExpense.saved}</Text>
+            </Animated.View>
+          ) : null}
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}

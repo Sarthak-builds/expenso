@@ -17,6 +17,8 @@ type ListRowProps = {
   /** Trailing slot. Replaces the chevron entirely when provided. */
   trailing?: React.ReactNode;
   onPress?: () => void;
+  /** Secondary action. A row with only this is still pressable for feedback. */
+  onLongPress?: () => void;
   destructive?: boolean;
   className?: string;
 };
@@ -37,6 +39,7 @@ function ListRow({
   leading,
   trailing,
   onPress,
+  onLongPress,
   destructive = false,
   className,
 }: ListRowProps) {
@@ -73,10 +76,10 @@ function ListRow({
     </View>
   );
 
-  if (!onPress) return content;
+  if (!onPress && !onLongPress) return content;
 
   return (
-    <PressableScale accessibilityRole="button" onPress={onPress}>
+    <PressableScale accessibilityRole="button" onPress={onPress} onLongPress={onLongPress}>
       {content}
     </PressableScale>
   );

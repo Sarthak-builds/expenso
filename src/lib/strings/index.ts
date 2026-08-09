@@ -93,9 +93,19 @@ export const strings = {
     saved: 'Expense saved',
     errors: {
       missingLabel: 'Say what the expense was for.',
+      labelTooLong: 'Keep it under 64 characters.',
       missingAmount: 'Enter an amount greater than zero.',
       invalidAmount: 'That amount is not a valid number.',
+      missingCategory: 'Pick a category.',
+      noteTooLong: 'Keep the note under 140 characters.',
     },
+  },
+
+  expenses: {
+    deleteTitle: 'Delete this expense?',
+    // A function, not a template in the component — interpolation is still
+    // copy, and this keeps every user-facing sentence in one file.
+    deleteBody: (label: string) => `"${label}" will be removed. This cannot be undone.`,
   },
 
   categories: {
