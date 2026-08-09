@@ -5,6 +5,7 @@
  * cross-feature edge, and it is one-way. Nothing in expenses imports chat.
  */
 export { AddExpenseScreen } from './screens/add-expense-screen';
+export type { AddExpenseSeed } from './screens/add-expense-screen';
 export { DashboardScreen } from './screens/dashboard-screen';
 
 export { addExpense, clearAllExpenses, countAll, migrateIfNeeded, repair } from './data/expense.repository';

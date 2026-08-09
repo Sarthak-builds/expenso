@@ -139,6 +139,8 @@ export const strings = {
       invalidKey: 'That Gemini API key was rejected. Check it in Settings.',
       rateLimited: 'Too many requests. Wait a moment and try again.',
       network: 'Could not reach Gemini. Check your connection.',
+      timeout: 'Gemini took too long to answer. Try again.',
+      malformed: 'Gemini sent back something unreadable. Try rephrasing.',
       unexpected: 'Something went wrong. Try again.',
     },
   },

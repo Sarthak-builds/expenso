@@ -15,8 +15,37 @@ import { motion } from '@/lib/theme';
 import { addExpense } from '../data/expense.repository';
 import { addExpenseInitialValues, addExpenseSchema } from '../schema/add-expense.schema';
 import { isCategoryId } from '../model/types';
+import { formatMinorForInput, isDayKey } from '@/lib/format';
 
 const CONFIRMATION_MS = 1800;
+
+/**
+ * Values handed over from a chat suggestion the user chose to edit.
+ * Every field is optional and untrusted — they arrive as route params, which
+ * are strings from outside this screen's control.
+ */
+export type AddExpenseSeed = {
+  label?: string;
+  amountMinor?: string;
+  categoryId?: string;
+  day?: string;
+};
+
+function applySeed(seed: AddExpenseSeed | undefined) {
+  const values = addExpenseInitialValues();
+  if (!seed) return values;
+
+  const amountMinor = Number(seed.amountMinor);
+  return {
+    ...values,
+    ...(seed.label ? { label: seed.label } : {}),
+    ...(Number.isFinite(amountMinor) && amountMinor > 0
+      ? { amount: formatMinorForInput(amountMinor) }
+      : {}),
+    ...(isCategoryId(seed.categoryId) ? { categoryId: seed.categoryId } : {}),
+    ...(seed.day && isDayKey(seed.day) ? { day: seed.day } : {}),
+  };
+}
 
 /**
  * Add an expense.
@@ -26,11 +55,23 @@ const CONFIRMATION_MS = 1800;
  * sitting — and bouncing to the dashboard after each would cost a tab tap to
  * get back. The confirmation is what tells the user it worked.
  */
-export function AddExpenseScreen() {
+export function AddExpenseScreen({ seed }: { seed?: AddExpenseSeed }) {
   const insets = useSafeAreaInsets();
-  const [initialValues, setInitialValues] = React.useState(addExpenseInitialValues);
+  const [initialValues, setInitialValues] = React.useState(() => applySeed(seed));
   const form = useSchemaForm({ schema: addExpenseSchema, initialValues });
   const [saved, setSaved] = React.useState(false);
+
+  // A second suggestion arriving while this tab is already mounted must
+  // replace the draft; the lazy initializer above only runs on first mount.
+  const seedKey = `${seed?.label ?? ''}|${seed?.amountMinor ?? ''}|${seed?.day ?? ''}`;
+  const lastSeedKey = React.useRef(seedKey);
+  React.useEffect(() => {
+    if (lastSeedKey.current === seedKey || !seed?.label) return;
+    lastSeedKey.current = seedKey;
+    const next = applySeed(seed);
+    setInitialValues(next);
+    form.reset(next);
+  }, [form, seed, seedKey]);
 
   React.useEffect(() => {
     if (!saved) return;
