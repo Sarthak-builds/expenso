@@ -40,6 +40,8 @@ export const strings = {
       wrongPin: 'Wrong PIN. Try again.',
       incompletePhone: 'Enter all 10 digits of your number.',
       incompletePin: 'Enter all 4 digits of your PIN.',
+      notConfigured:
+        'This build has no device lock configured. Add the values to .env and restart with --clear.',
     },
   },
 
