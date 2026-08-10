@@ -1,24 +1,13 @@
-import { accents, amber, base, blue, pink, red, teal, violet } from './palette';
+import { accents, amber, blue, pink, teal, violet } from './palette';
 
 /**
- * Runtime design tokens, for the places a `className` cannot reach:
- * `react-native-svg` fill props, the native tab bar tint, and the status bar.
+ * Runtime design tokens that do NOT depend on the active theme.
  *
- * Everything else styles through NativeWind. If you can express it as a class,
- * do that instead — reaching for this module is the exception.
+ * Theme-dependent colours moved to `useThemeColors()` — a static `colors`
+ * export used to live here, and it was a trap once themes existed: a chart
+ * importing it would keep painting Geist blue on the pink theme, with nothing
+ * to indicate why. If you need a themed colour at runtime, use the hook.
  */
-
-export const colors = {
-  background: base.white,
-  foreground: base.black,
-  border: accents[2],
-  /** Faint fills: card backgrounds, chart tracks, disabled states. */
-  subtle: accents[1],
-  /** Secondary text and axis labels. */
-  muted: accents[5],
-  accent: blue.DEFAULT,
-  danger: red.DEFAULT,
-} as const;
 
 /**
  * Categorical series colours, in assignment order.

@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import { cn } from '@/lib/utils/cn';
-import { colors, motion } from '@/lib/theme';
+import { motion, useThemeColors } from '@/lib/theme';
 
 type Segment = { key: string; value: number; color: string };
 
@@ -27,6 +27,7 @@ const MIN_FLEX = 0.02;
  * thread every frame. See docs/adr/0008-charts.md
  */
 function ProportionBar({ segments, height = 8, className }: ProportionBarProps) {
+  const colors = useThemeColors();
   const total = segments.reduce((sum, segment) => sum + segment.value, 0);
 
   if (total <= 0) {

@@ -45,6 +45,14 @@ function Chip({ label, selected = false, icon, accentColor, onPress, className }
             className={selected ? 'text-background' : 'text-accents-5'}
             {...(!selected && accentColor ? { color: accentColor } : {})}
           />
+        ) : accentColor ? (
+          // No icon, but a colour to show — render it as a swatch. This is what
+          // makes the theme picker legible before you pick: three pills that
+          // differ only in wording tell you nothing about what you are choosing.
+          <View
+            className={cn('h-3 w-3 rounded-full', selected && 'border border-background')}
+            style={{ backgroundColor: accentColor }}
+          />
         ) : null}
         <Text
           className={cn(

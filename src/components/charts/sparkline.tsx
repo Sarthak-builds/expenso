@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { colors } from '@/lib/theme';
+import { useThemeColors } from '@/lib/theme';
 
 import { areaPath, linePath, scalePoints, type Point } from './path';
 
@@ -25,11 +25,13 @@ type SparklineProps = {
 function Sparkline({
   points,
   height = 32,
-  color = colors.accent,
+  color,
   filled = false,
   className,
 }: SparklineProps) {
   const [width, setWidth] = React.useState(0);
+  const colors = useThemeColors();
+  const strokeColor = color ?? colors.accent;
 
   const handleLayout = React.useCallback((event: LayoutChangeEvent) => {
     setWidth(event.nativeEvent.layout.width);
@@ -43,11 +45,11 @@ function Sparkline({
       {scaled.length > 1 ? (
         <Svg width={width} height={height}>
           {filled ? (
-            <Path d={areaPath(scaled, height)} fill={color} fillOpacity={0.08} />
+            <Path d={areaPath(scaled, height)} fill={strokeColor} fillOpacity={0.08} />
           ) : null}
           <Path
             d={linePath(scaled)}
-            stroke={color}
+            stroke={strokeColor}
             strokeWidth={1.5}
             strokeLinejoin="round"
             strokeLinecap="round"

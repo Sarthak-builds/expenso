@@ -1,6 +1,6 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
-import { colors } from '@/lib/theme';
+import { useThemeColors } from '@/lib/theme';
 import { strings } from '@/lib/strings';
 
 /**
@@ -17,10 +17,14 @@ import { strings } from '@/lib/strings';
  * Four tabs — `ui-ux-pro-max` puts the ceiling at five. See ADR 0006.
  */
 export default function TabsLayout() {
+  // The tab bar is native, so its colours are props rather than classes — this
+  // is one of the two places `useThemeColors` is the right tool.
+  const colors = useThemeColors();
+
   return (
     <NativeTabs
       backgroundColor={colors.background}
-      tintColor={colors.foreground}
+      tintColor={colors.accent}
       iconColor={colors.muted}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon sf="chart.bar.fill" md="bar_chart" />

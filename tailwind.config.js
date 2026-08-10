@@ -1,4 +1,13 @@
-const { base, accents, blue, red, amber, violet, teal, pink } = require('./src/lib/theme/palette');
+const { amber, violet, teal, pink } = require('./src/lib/theme/palette');
+
+/**
+ * A colour that follows the active theme.
+ *
+ * `<alpha-value>` is substituted by Tailwind with whatever opacity modifier the
+ * class carries, which is why the variables hold `R G B` triplets rather than
+ * hex — see `src/lib/theme/themes.ts`.
+ */
+const themed = (name) => `rgb(var(--color-${name}) / <alpha-value>)`;
 
 /**
  * Vercel Geist design tokens — the single source of design values.
@@ -17,10 +26,35 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // --- Primitive layer -------------------------------------------------
-        accents,
-        blue,
-        red,
+        // --- Themed ----------------------------------------------------------
+        // Resolved at runtime from CSS variables so the app can switch between
+        // Geist / Light Blue / Light Pink without a reload.
+        //
+        // The `rgb(var(--x) / <alpha-value>)` form is load-bearing: it is what
+        // keeps opacity modifiers working. `bg-primary/90`, `border-red/20` and
+        // `shadow-black/5` appear throughout the RNR atoms, and a bare
+        // `var(--x)` holding a hex string breaks every one of them silently.
+        // See docs/adr/0012-runtime-themes.md
+        accents: {
+          1: themed('accents-1'),
+          2: themed('accents-2'),
+          3: themed('accents-3'),
+          4: themed('accents-4'),
+          5: themed('accents-5'),
+          6: themed('accents-6'),
+          7: themed('accents-7'),
+          8: themed('accents-8'),
+        },
+
+        // The single accent — chart bars, links, focus ring. Named `blue` for
+        // continuity with the Geist scale, but it is pink under the pink theme.
+        blue: themed('brand'),
+        red: themed('danger'),
+
+        // --- Static ----------------------------------------------------------
+        // The categorical chart ramp does NOT theme. These encode data, not
+        // chrome: a category has to keep the same colour when the theme
+        // changes, or the legend stops meaning anything across a screenshot.
         amber,
         violet,
         teal,
@@ -31,19 +65,20 @@ module.exports = {
         // semantic token names. Mapping them onto Geist values here is what
         // makes RNR render as Geist rather than as default shadcn.
         // Never use these names for new app code — prefer the primitives above.
-        background: base.white,
-        foreground: base.black,
-        card: { DEFAULT: base.white, foreground: base.black },
-        popover: { DEFAULT: base.white, foreground: base.black },
-        // Geist's primary action is a solid black button, not a coloured one.
-        primary: { DEFAULT: base.black, foreground: base.white },
-        secondary: { DEFAULT: accents[1], foreground: base.black },
-        muted: { DEFAULT: accents[1], foreground: accents[5] },
-        accent: { DEFAULT: accents[1], foreground: base.black },
-        destructive: { DEFAULT: red.DEFAULT, foreground: base.white },
-        border: accents[2],
-        input: accents[2],
-        ring: blue.DEFAULT,
+        background: themed('background'),
+        foreground: themed('foreground'),
+        card: { DEFAULT: themed('card'), foreground: themed('card-foreground') },
+        popover: { DEFAULT: themed('popover'), foreground: themed('popover-foreground') },
+        // Geist's primary action is a solid black button; the tinted themes
+        // make it their brand colour, darkened until white text passes 4.5:1.
+        primary: { DEFAULT: themed('primary'), foreground: themed('primary-foreground') },
+        secondary: { DEFAULT: themed('secondary'), foreground: themed('secondary-foreground') },
+        muted: { DEFAULT: themed('muted'), foreground: themed('muted-foreground') },
+        accent: { DEFAULT: themed('accent'), foreground: themed('accent-foreground') },
+        destructive: { DEFAULT: themed('danger'), foreground: themed('danger-foreground') },
+        border: themed('border'),
+        input: themed('input'),
+        ring: themed('ring'),
       },
       fontFamily: {
         // PostScript names — 'Geist' alone silently falls back on Android.

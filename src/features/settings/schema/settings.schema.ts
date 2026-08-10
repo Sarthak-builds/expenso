@@ -1,5 +1,16 @@
-import type { UiSchema } from '@/components/organisms/schema-form';
+import type { SelectOption, UiSchema } from '@/components/organisms/schema-form';
 import { strings } from '@/lib/strings';
+import { THEME_COLORS, THEME_IDS } from '@/lib/theme';
+
+/**
+ * Each theme's chip carries its own accent, so the choice is legible before
+ * you make it rather than three identical pills with different words on them.
+ */
+const themeOptions: SelectOption[] = THEME_IDS.map((id) => ({
+  value: id,
+  label: strings.settings.themes[id],
+  color: THEME_COLORS[id].accent,
+}));
 
 /** Action ids the settings screen handles. Kept as a union so a typo is a
  *  compile error rather than a button that silently does nothing. */
@@ -79,6 +90,21 @@ export function buildSettingsSchema({
               },
             ] as const)
           : []),
+      ],
+    },
+    {
+      type: 'section',
+      id: 'appearance',
+      title: strings.settings.appearance,
+      children: [
+        {
+          type: 'field',
+          kind: 'select',
+          name: 'themeId',
+          label: strings.settings.theme,
+          hint: strings.settings.themeHelp,
+          options: themeOptions,
+        },
       ],
     },
     {

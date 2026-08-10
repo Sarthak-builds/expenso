@@ -4,14 +4,14 @@ import Svg, { Rect } from 'react-native-svg';
 
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils/cn';
-import { colors, radius } from '@/lib/theme';
+import { radius, useThemeColors } from '@/lib/theme';
 
 import { maxY, type Point } from './path';
 
 type BarChartProps = {
   points: readonly Point[];
   height?: number;
-  /** Bar fill. Defaults to the single Geist accent. */
+  /** Bar fill. Defaults to the active theme's accent. */
   color?: string;
   /** Up to two labels under the axis — usually the window's first and last day. */
   axisLabels?: [string, string];
@@ -34,11 +34,15 @@ const GAP_RATIO = 0.25;
 function BarChart({
   points,
   height = 120,
-  color = colors.accent,
+  color,
   axisLabels,
   className,
 }: BarChartProps) {
   const [width, setWidth] = React.useState(0);
+  // Resolved here rather than as a default parameter — a default cannot call a
+  // hook, and hard-coding one would ignore the theme.
+  const colors = useThemeColors();
+  const barColor = color ?? colors.accent;
 
   const handleLayout = React.useCallback((event: LayoutChangeEvent) => {
     setWidth(event.nativeEvent.layout.width);
@@ -66,7 +70,7 @@ function BarChart({
                   width={barWidth}
                   height={barHeight}
                   rx={radius.bar}
-                  fill={point.y > 0 ? color : colors.border}
+                  fill={point.y > 0 ? barColor : colors.border}
                 />
               );
             })}

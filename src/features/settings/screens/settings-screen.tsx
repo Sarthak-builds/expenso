@@ -8,8 +8,10 @@ import { Text } from '@/components/ui/text';
 import { geminiKeySource } from '@/lib/ai';
 import { strings } from '@/lib/strings';
 
+import { isThemeId } from '@/lib/theme';
+
 import { buildSettingsSchema, type SettingsAction } from '../schema/settings.schema';
-import { useApiKey, useSetApiKey } from '../store/settings.store';
+import { useApiKey, useSetApiKey, useSetThemeId, useThemeSetting } from '../store/settings.store';
 
 type SettingsScreenProps = {
   /** Supplied by the route. Settings does not import auth — see CLAUDE.md. */
@@ -38,8 +40,13 @@ export function SettingsScreen({
   const insets = useSafeAreaInsets();
   const apiKey = useApiKey();
   const setApiKey = useSetApiKey();
+  const themeId = useThemeSetting();
+  const setThemeId = useSetThemeId();
 
-  const initialValues = React.useMemo(() => ({ apiKey: apiKey ?? '' }), [apiKey]);
+  const initialValues = React.useMemo(
+    () => ({ apiKey: apiKey ?? '', themeId }),
+    [apiKey, themeId]
+  );
   const schema = React.useMemo(
     () =>
       buildSettingsSchema({
@@ -53,6 +60,22 @@ export function SettingsScreen({
   );
 
   const form = useSchemaForm({ schema, initialValues });
+
+  /**
+   * Theme applies on tap, not on a Save button.
+   *
+   * A colour choice you cannot see until you commit it is a guess. Everything
+   * else on this screen is text that needs confirming before it takes effect;
+   * this one is its own preview, so it commits straight to the store and the
+   * whole app repaints under the picker.
+   */
+  const handleSetValue = React.useCallback(
+    (name: string, value: string) => {
+      form.setValue(name, value);
+      if (name === 'themeId' && isThemeId(value)) setThemeId(value);
+    },
+    [form, setThemeId]
+  );
 
   const handleAction = React.useCallback(
     (id: string) => {
@@ -94,7 +117,7 @@ export function SettingsScreen({
         schema={schema}
         values={form.values}
         errors={form.errors}
-        setValue={form.setValue}
+        setValue={handleSetValue}
         onAction={handleAction}
       />
     </ScrollView>
