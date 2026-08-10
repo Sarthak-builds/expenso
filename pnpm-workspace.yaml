@@ -27,5 +27,11 @@ minimumReleaseAgeExclude:
   - expo-router@57.0.11
   - expo-symbols@57.0.2
 
+# pnpm 11 refuses to run a dependency's install script until it is listed here,
+# and errors with ERR_PNPM_IGNORED_BUILDS until every candidate has a verdict.
 allowBuilds:
-  dtrace-provider: set this to true or false
+  # DTrace bindings, reached transitively via eas-cli -> bunyan. DTrace exists
+  # on Solaris and macOS; this is a Windows machine and the build would fail
+  # anyway. bunyan degrades gracefully when the native addon is absent — it
+  # simply logs without DTrace probes, which nothing here uses.
+  dtrace-provider: false
