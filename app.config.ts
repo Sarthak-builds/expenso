@@ -60,5 +60,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
     reactCompiler: true,
   },
+  // `eas init` cannot write to a dynamic (TypeScript) config — it prints the
+  // project id and expects you to paste it in here as
+  // `eas: { projectId: '…' }`. See docs/building.md
   extra: { variant },
 });

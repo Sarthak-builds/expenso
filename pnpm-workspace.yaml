@@ -26,3 +26,6 @@ minimumReleaseAgeExclude:
   - expo@57.0.11
   - expo-router@57.0.11
   - expo-symbols@57.0.2
+
+allowBuilds:
+  dtrace-provider: set this to true or false

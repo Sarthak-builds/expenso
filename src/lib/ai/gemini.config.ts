@@ -20,9 +20,16 @@ export const GEMINI_GENERATION_CONFIG = {
   // Extraction, not composition. Any creativity here is a wrong number.
   temperature: 0,
   responseMimeType: 'application/json',
-  // Thinking triples latency and cost for no measurable accuracy gain on a
-  // task this mechanical.
-  thinkingConfig: { thinkingBudget: 0 },
+  // Thinking adds latency and cost for no measurable accuracy gain on a task
+  // this mechanical.
+  //
+  // `thinkingLevel`, NOT `thinkingBudget`. Gemini 3.x rejects `thinkingBudget`
+  // outright — the whole request comes back
+  // `400 INVALID_ARGUMENT: Request contains an invalid argument`, with nothing
+  // naming the offending field. Verified against the live API on 2026-08-08:
+  // every other part of this config is accepted, and swapping this one line
+  // back to `{ thinkingBudget: 0 }` fails 100% of calls.
+  thinkingConfig: { thinkingLevel: 'minimal' },
 } as const;
 
 /** The digest is the value, not the transcript — history stays short. */

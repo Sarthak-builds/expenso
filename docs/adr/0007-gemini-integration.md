@@ -25,9 +25,24 @@ records as context — fails on both cost and correctness.
 }
 ```
 
-with `temperature: 0`, `thinkingConfig: { thinkingBudget: 0 }`, and
-`propertyOrdering` set. `enum` on `categoryId` and `intent` means the app can
-never receive a value it does not understand.
+with `temperature: 0`, minimal thinking, and `propertyOrdering` set. `enum` on
+`categoryId` and `intent` means the app can never receive a value it does not
+understand.
+
+> **Correction, 2026-08-08 — verified against the live API.**
+> This ADR originally specified `thinkingConfig: { thinkingBudget: 0 }`. That
+> is a Gemini 2.x field and **`gemini-3.6-flash` rejects it**: the request fails
+> with `400 INVALID_ARGUMENT — Request contains an invalid argument`, and the
+> error names no field, so it reads like a bad schema or a bad key.
+>
+> The 3.x equivalent is `thinkingConfig: { thinkingLevel: 'minimal' }`.
+> Bisected against the real endpoint: every other part of the request is
+> accepted, and only this field fails. `'minimal' | 'low' | 'medium' | 'high'`
+> are all valid; `thinkingBudget` as a positive integer is also still accepted,
+> but `0` is not.
+>
+> The decision below is unchanged — thinking stays off. Only the field name was
+> wrong.
 
 Model: **`gemini-3.6-flash`** via
 `POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent`,
@@ -81,5 +96,18 @@ finance app. `generateContent` is labelled legacy yet remains fully supported
 and still receives new flagship models. Model id and endpoint live in
 `lib/ai/gemini.config.ts` so migrating is a one-file change.
 
-**`thinkingBudget: 0`** because extraction is trivial; enabling thinking triples
-latency and cost for no measurable accuracy gain on this task.
+**Minimal thinking** because extraction is trivial; enabling it adds latency
+and cost for no measurable accuracy gain on this task.
+
+**Verified end-to-end against the live API, 2026-08-08**, with a representative
+digest. All four cases behave as designed:
+
+| Input | Intent | Result |
+|---|---|---|
+| `milk 30` | `add_expense` | `amountMinor: 3000`, `groceries`, today |
+| `how much on groceries in the last 30 days?` | `answer_question` | ₹1,820 — correct paise→rupee conversion |
+| `spent on milk today` | `clarify` | asks for the amount, emits no expense |
+| `what did I spend on rent last month?` | `answer_question` | declines to invent a figure, offers the real `bills` total instead |
+
+The last row is the one that matters: rent is absent from the digest, and the
+model said so rather than producing a plausible number.
