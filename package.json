@@ -68,6 +68,9 @@
     "start:main": "cross-env APP_VARIANT=production expo start --dev-client",
     "prebuild:staging": "cross-env APP_VARIANT=staging expo prebuild --clean",
     "prebuild:main": "cross-env APP_VARIANT=production expo prebuild --clean",
+    "build:dev": "eas build --profile development --platform android",
+    "build:preview": "eas build --profile preview --platform android",
+    "build:aab": "eas build --profile production --platform android",
     "typecheck": "tsc --noEmit",
     "doctor": "expo-doctor",
     "lint": "expo lint"

@@ -60,8 +60,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
     reactCompiler: true,
   },
-  // `eas init` cannot write to a dynamic (TypeScript) config — it prints the
-  // project id and expects you to paste it in here as
-  // `eas: { projectId: '…' }`. See docs/building.md
-  extra: { variant },
+  // Pins builds to the account that owns the EAS project, so a build does not
+  // silently target a different org depending on who is logged in.
+  owner: 'sarthakshiroty21',
+  extra: {
+    variant,
+    // Pasted by hand: `eas init` cannot write to a dynamic (TypeScript)
+    // config, it only prints the id. Not a secret — it identifies the
+    // project, it does not authorise anything. See docs/building.md
+    eas: { projectId: '4c5a590c-7c0d-4122-9a45-8a75b0e3395f' },
+  },
 });

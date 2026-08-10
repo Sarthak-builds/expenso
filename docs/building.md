@@ -19,14 +19,23 @@ the login screen reports that the build has no device lock configured and
 nobody can get in. That is the designed behaviour (ADR 0004), but it looks like
 a bug if you are not expecting it.
 
-**Fix — register the values with EAS once:**
+**This is already done** for `@sarthakshiroty21/expenso` — all four values are
+registered for `production`, `preview` and `development`. Check with:
 
 ```bash
-pnpm exec eas env:create --name EXPO_PUBLIC_GEMINI_API_KEY --value "<key>" --visibility plaintext --environment production --environment preview --environment development
-pnpm exec eas env:create --name EXPO_PUBLIC_USER_A_PHONE  --value "<10 digits>"  --visibility plaintext --environment production --environment preview --environment development
-pnpm exec eas env:create --name EXPO_PUBLIC_USER_B_PHONE  --value "<10 digits>"  --visibility plaintext --environment production --environment preview --environment development
-pnpm exec eas env:create --name EXPO_PUBLIC_PIN_HASH      --value "<sha256 hex>"  --visibility plaintext --environment production --environment preview --environment development
+pnpm exec eas env:list --environment production
 ```
+
+To change one, or to set them up on a fresh project:
+
+```bash
+pnpm exec eas env:set --name EXPO_PUBLIC_GEMINI_API_KEY --value "<key>"        --visibility plaintext --environment production --environment preview --environment development
+pnpm exec eas env:set --name EXPO_PUBLIC_USER_A_PHONE   --value "<10 digits>"  --visibility plaintext --environment production --environment preview --environment development
+pnpm exec eas env:set --name EXPO_PUBLIC_USER_B_PHONE   --value "<10 digits>"  --visibility plaintext --environment production --environment preview --environment development
+pnpm exec eas env:set --name EXPO_PUBLIC_PIN_HASH       --value "<sha256 hex>" --visibility plaintext --environment production --environment preview --environment development
+```
+
+(`env:create` still works but is deprecated; `env:set` is the current command.)
 
 `--visibility plaintext` is deliberate and correct. Marking these `secret`
 would imply a protection that does not exist: every `EXPO_PUBLIC_*` value is
@@ -43,18 +52,27 @@ node -e "console.log(require('crypto').createHash('sha256').update('1234').diges
 
 ---
 
-## First-time setup
+## Project
 
-```bash
-pnpm exec eas login          # an Expo account; free tier is enough
-pnpm exec eas init           # writes extra.eas.projectId into app.config.ts
-```
+Already initialised — nothing to do here.
 
-Then register the env values as above.
+| | |
+|---|---|
+| Project | `@sarthakshiroty21/expenso` |
+| Owner | `sarthakshiroty21` (personal, not the `bull-agritech` org) |
+| Dashboard | https://expo.dev/accounts/sarthakshiroty21/projects/expenso |
 
-Signing keys: let EAS generate and store the Android keystore on first build —
-say yes when prompted. **Back it up** (`pnpm exec eas credentials`) once it exists.
-Losing it means you can never update the app on Play under the same identity.
+`owner` and `extra.eas.projectId` are both pinned in `app.config.ts`, so a build
+targets this project regardless of which account is logged in.
+
+`eas init` cannot write to a dynamic (TypeScript) config — it prints the id and
+stops. That is why the id is pasted in by hand rather than generated. It is not
+a secret: it identifies the project, it does not authorise anything.
+
+Signing keys: let EAS generate and store the Android keystore on the first
+build — say yes when prompted. **Back it up** (`pnpm exec eas credentials`) once
+it exists. Losing it means you can never update the app on Play under the same
+identity.
 
 ---
 
@@ -62,9 +80,9 @@ Losing it means you can never update the app on Play under the same identity.
 
 | Goal | Command | Output |
 |---|---|---|
-| Dev build to develop against | `pnpm exec eas build --profile development --platform android` | APK |
-| Share a testable build | `pnpm exec eas build --profile preview --platform android` | APK |
-| Play Store upload | `pnpm exec eas build --profile production --platform android` | AAB |
+| Dev build to develop against | `pnpm build:dev` | APK |
+| Share a testable build | `pnpm build:preview` | APK |
+| Play Store upload | `pnpm build:aab` | AAB |
 
 Install the APK on the device, then `pnpm start:staging` and scan the QR.
 
