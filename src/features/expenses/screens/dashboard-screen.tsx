@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { RefreshControl, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Wallet } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -7,7 +7,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmptyState, SectionHeader } from '@/components/molecules';
 import { Text } from '@/components/ui/text';
+import { useRefreshControl } from '@/lib/hooks/use-refresh-control';
 import { strings } from '@/lib/strings';
+import { useThemeColors } from '@/lib/theme';
+
+import { refreshExpenses } from '../data/changes';
 
 import { CategoryBreakdown } from '../components/category-breakdown';
 import { DayHeader } from '../components/day-header';
@@ -35,6 +39,8 @@ export function DashboardScreen() {
   const insets = useSafeAreaInsets();
   const summary = useRangeSummary();
   const items = useExpenseList();
+  const colors = useThemeColors();
+  const refresh = useRefreshControl(refreshExpenses);
 
   const renderItem = React.useCallback(({ item }: { item: ExpenseListItem }) => {
     if (item.kind === 'header') {
@@ -92,6 +98,14 @@ export function DashboardScreen() {
         />
       }
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
+      refreshControl={
+        <RefreshControl
+          {...refresh}
+          tintColor={colors.accent}
+          colors={[colors.accent]}
+          progressBackgroundColor={colors.background}
+        />
+      }
     />
   );
 }

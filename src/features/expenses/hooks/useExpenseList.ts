@@ -24,11 +24,19 @@ export function useExpenseList(limit?: number): ExpenseListItem[] {
   const rangeId = useRangeId();
   const revision = useRevision();
 
-  // See the note in `useRangeSummary` about `revision`.
-  return useMemo(() => buildExpenseList(rangeId, limit), [rangeId, revision, limit]);
+  // `revision` is passed, not just depended on — see the note in
+  // `data/aggregate.ts` about React Compiler discarding dependency arrays.
+  return useMemo(
+    () => buildExpenseList(rangeId, revision, limit),
+    [rangeId, revision, limit]
+  );
 }
 
-function buildExpenseList(rangeId: RangeId, limit?: number): ExpenseListItem[] {
+function buildExpenseList(
+  rangeId: RangeId,
+  revision: number,
+  limit?: number
+): ExpenseListItem[] {
   const today = todayKey();
   const expenses = listInRange(addDays(today, -(RANGE_LENGTHS[rangeId] - 1)), today);
   const capped = limit === undefined ? expenses : expenses.slice(0, limit);

@@ -81,7 +81,8 @@ export function listInRange(from: DayKey, to: DayKey): Expense[] {
   return out;
 }
 
-export function countAll(): number {
+/** `revision` is a memo cache key, never read — see the note in `aggregate.ts`. */
+export function countAll(revision?: number): number {
   let total = 0;
   for (const day of getDays()) total += getDaySummary(day).count;
   return total;

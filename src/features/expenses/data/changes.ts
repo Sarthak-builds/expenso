@@ -26,3 +26,16 @@ export function onExpensesChanged(listener: Listener): () => void {
 export function notifyExpensesChanged(): void {
   for (const listener of listeners) listener();
 }
+
+/**
+ * Forces every derived view to recompute from storage.
+ *
+ * Same mechanism as a write, with no write — it is what pull-to-refresh calls.
+ * Strictly speaking nothing can go stale in a single-process app with one
+ * writer, so this is a manual escape hatch rather than a correctness measure:
+ * if a screen ever does look wrong, the user has a way to make it re-read
+ * instead of force-quitting.
+ */
+export function refreshExpenses(): void {
+  notifyExpensesChanged();
+}

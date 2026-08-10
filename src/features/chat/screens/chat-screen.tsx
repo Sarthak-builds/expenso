@@ -1,11 +1,14 @@
 import * as React from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, RefreshControl, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { MessageCircleQuestionMark } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/molecules';
+import { refreshExpenses } from '@/features/expenses';
+import { useRefreshControl } from '@/lib/hooks/use-refresh-control';
 import { strings } from '@/lib/strings';
+import { useThemeColors } from '@/lib/theme';
 
 import { Composer } from '../components/composer';
 import { ExpenseConfirmCard } from '../components/expense-confirm-card';
@@ -31,6 +34,10 @@ import type { ChatMessage } from '../model/types';
 export function ChatScreen() {
   const insets = useSafeAreaInsets();
   const { messages, send, isPending } = useChat();
+  const colors = useThemeColors();
+  // Re-derives the spend digest the next message will carry, so a pull here
+  // means the assistant is answering from current totals.
+  const refresh = useRefreshControl(refreshExpenses);
 
   const renderItem = React.useCallback(({ item }: { item: ChatMessage }) => {
     if (item.suggestion) {
@@ -62,6 +69,14 @@ export function ChatScreen() {
         }}
         contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 16 }}
         contentContainerClassName="px-4"
+        refreshControl={
+          <RefreshControl
+            {...refresh}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressBackgroundColor={colors.background}
+          />
+        }
         ListFooterComponent={isPending ? <TypingIndicator /> : null}
         ListEmptyComponent={
           <EmptyState

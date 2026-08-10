@@ -9,16 +9,39 @@ import {
 import { getSummariesInRange } from './expense.repository';
 
 /**
- * Derivations over the `sum:` rollups. Pure functions of `(rangeId, today)` —
- * they read storage but hold no state, so the UI can call them during render
- * and memoize on `[rangeId, revision]`.
+ * Derivations over the `sum:` rollups. They read storage but hold no state, so
+ * the UI can call them during render.
  *
  * Nothing here hydrates an `exp:` record. That is the whole point: the cost is
  * bounded by the window length, not the dataset size.
+ *
+ * ## Why every one of these takes `revision`
+ *
+ * It is never read. It exists so the caller's `useMemo` recomputes after a
+ * write — and it has to be an ARGUMENT, not just a dependency in the array.
+ *
+ * React Compiler re-derives dependencies from what the memo body actually
+ * uses and discards the hand-written array. `useMemo(() => f(rangeId),
+ * [rangeId, revision])` compiles to a cache keyed on `rangeId` alone:
+ *
+ *     if ($[0] !== rangeId) { t0 = buildRangeSummary(rangeId); ... }
+ *
+ * The store bumps, the component re-renders, and the memo hands back the stale
+ * value — the dashboard silently stops updating after an add. Passing
+ * `revision` into the call puts it back in the data flow:
+ *
+ *     if ($[0] !== rangeId || $[1] !== revision) { ... }
+ *
+ * Verified by compiling both forms with babel-plugin-react-compiler.
+ * See docs/adr/0002-state-management.md
  */
 
 /** Everything the dashboard needs for one window, in a single pass. */
-export function buildRangeSummary(rangeId: RangeId, today: DayKey = todayKey()): RangeSummary {
+export function buildRangeSummary(
+  rangeId: RangeId,
+  revision: number,
+  today: DayKey = todayKey()
+): RangeSummary {
   const length = RANGE_LENGTHS[rangeId];
   const days = lastNDays(length, today);
   const from = days[0]!;
@@ -74,6 +97,7 @@ export function totalInRange(from: DayKey, to: DayKey): number {
  */
 export function trendAgainstPreviousPeriod(
   rangeId: RangeId,
+  revision: number,
   today: DayKey = todayKey()
 ): { current: number; previous: number; changeRatio: number | null } {
   const length = RANGE_LENGTHS[rangeId];

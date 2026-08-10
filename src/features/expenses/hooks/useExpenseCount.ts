@@ -12,5 +12,6 @@ import { useRevision } from '../store/expenses.store';
  */
 export function useExpenseCount(): number {
   const revision = useRevision();
-  return useMemo(() => countAll(), [revision]);
+  // Passed, not just depended on — see the note in `data/aggregate.ts`.
+  return useMemo(() => countAll(revision), [revision]);
 }

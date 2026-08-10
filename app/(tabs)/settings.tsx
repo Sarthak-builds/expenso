@@ -1,5 +1,5 @@
 import { useSession, useSignOut } from '@/features/auth';
-import { clearAllExpenses, useExpenseCount } from '@/features/expenses';
+import { clearAllExpenses, refreshExpenses, useExpenseCount } from '@/features/expenses';
 import { SettingsScreen } from '@/features/settings';
 
 /**
@@ -17,6 +17,7 @@ export default function SettingsRoute() {
       expenseCount={expenseCount}
       onLogOut={signOut}
       onResetData={clearAllExpenses}
+      onRefresh={refreshExpenses}
     />
   );
 }
