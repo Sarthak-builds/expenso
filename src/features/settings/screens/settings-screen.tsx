@@ -3,8 +3,8 @@ import { Alert, RefreshControl, ScrollView } from 'react-native';
 import Constants from 'expo-constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ScreenHeader } from '@/components/molecules';
 import { SchemaForm, useSchemaForm } from '@/components/organisms/schema-form';
-import { Text } from '@/components/ui/text';
 import { geminiKeySource } from '@/lib/ai';
 import { useRefreshControl } from '@/lib/hooks/use-refresh-control';
 import { strings } from '@/lib/strings';
@@ -114,7 +114,7 @@ export function SettingsScreen({
   return (
     <ScrollView
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 }}
+      contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 40 }}
       contentContainerClassName="gap-6 px-4"
       refreshControl={
         <RefreshControl
@@ -124,7 +124,7 @@ export function SettingsScreen({
           progressBackgroundColor={colors.background}
         />
       }>
-      <Text className="font-bold text-heading-40 text-foreground">{strings.settings.title}</Text>
+      <ScreenHeader title={strings.settings.title} />
 
       <SchemaForm
         schema={schema}

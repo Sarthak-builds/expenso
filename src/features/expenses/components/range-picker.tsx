@@ -23,10 +23,11 @@ export function RangePicker() {
 
   return (
     <SegmentedControl
+      size="sm"
       options={options}
       value={rangeId}
       onChange={setRange}
-      accessibilityLabel={strings.dashboard.rangeLabels[rangeId]}
+      accessibilityLabel={strings.dashboard.rangeA11y}
     />
   );
 }

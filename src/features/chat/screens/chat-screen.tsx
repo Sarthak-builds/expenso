@@ -1,20 +1,23 @@
 import * as React from 'react';
-import { KeyboardAvoidingView, Platform, RefreshControl, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, RefreshControl, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { MessageCircleQuestionMark } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { EmptyState } from '@/components/molecules';
+import { EmptyState, PressableScale, ScreenHeader } from '@/components/molecules';
+import { Text } from '@/components/ui/text';
 import { refreshExpenses } from '@/features/expenses';
 import { useRefreshControl } from '@/lib/hooks/use-refresh-control';
 import { strings } from '@/lib/strings';
 import { useThemeColors } from '@/lib/theme';
 
+import { ChatSuggestions } from '../components/chat-suggestions';
 import { Composer } from '../components/composer';
 import { ExpenseConfirmCard } from '../components/expense-confirm-card';
 import { MessageBubble } from '../components/message-bubble';
 import { TypingIndicator } from '../components/typing-indicator';
 import { useChat } from '../hooks/useChat';
+import { useChatStore } from '../store/chat.store';
 import type { ChatMessage } from '../model/types';
 
 /**
@@ -38,6 +41,14 @@ export function ChatScreen() {
   // Re-derives the spend digest the next message will carry, so a pull here
   // means the assistant is answering from current totals.
   const refresh = useRefreshControl(refreshExpenses);
+  const clearChat = useChatStore((state) => state.clear);
+
+  const handleClear = React.useCallback(() => {
+    Alert.alert(strings.chat.clearTitle, strings.chat.clearBody, [
+      { text: strings.common.cancel, style: 'cancel' },
+      { text: strings.chat.clear, style: 'destructive', onPress: clearChat },
+    ]);
+  }, [clearChat]);
 
   const renderItem = React.useCallback(({ item }: { item: ChatMessage }) => {
     if (item.suggestion) {
@@ -56,6 +67,25 @@ export function ChatScreen() {
       className="flex-1 bg-background"
       keyboardVerticalOffset={insets.bottom}
       behavior={Platform.select({ ios: 'padding', default: undefined })}>
+      {/* Outside the list: a transcript header that scrolled away with the
+          messages would take the only way to clear it with it. */}
+      <View
+        className="flex-row items-center justify-between px-4"
+        style={{ paddingTop: insets.top + 8 }}>
+        <ScreenHeader title={strings.chat.title} className="flex-1" />
+        {messages.length > 0 ? (
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityLabel={strings.chat.clearTitle}
+            hitSlop={12}
+            onPress={handleClear}>
+            <Text className="font-medium text-copy-14 text-accents-5">
+              {strings.chat.clear}
+            </Text>
+          </PressableScale>
+        ) : null}
+      </View>
+
       <FlashList
         data={messages}
         renderItem={renderItem}
@@ -67,7 +97,7 @@ export function ChatScreen() {
           startRenderingFromBottom: true,
           autoscrollToBottomThreshold: 0.2,
         }}
-        contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 16 }}
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: 16 }}
         contentContainerClassName="px-4"
         refreshControl={
           <RefreshControl
@@ -79,11 +109,14 @@ export function ChatScreen() {
         }
         ListFooterComponent={isPending ? <TypingIndicator /> : null}
         ListEmptyComponent={
-          <EmptyState
-            icon={MessageCircleQuestionMark}
-            title={strings.chat.empty.title}
-            body={strings.chat.empty.body}
-          />
+          <View className="gap-4">
+            <EmptyState
+              icon={MessageCircleQuestionMark}
+              title={strings.chat.empty.title}
+              body={strings.chat.empty.body}
+            />
+            <ChatSuggestions onSelect={send} />
+          </View>
         }
         ItemSeparatorComponent={Separator}
       />

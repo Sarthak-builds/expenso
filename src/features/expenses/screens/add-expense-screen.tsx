@@ -4,6 +4,7 @@ import { Check } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ScreenHeader } from '@/components/molecules';
 import { SchemaForm, useSchemaForm } from '@/components/organisms/schema-form';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -114,8 +115,10 @@ export function AddExpenseScreen({ seed }: { seed?: AddExpenseSeed }) {
       <ScrollView
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
-        contentContainerClassName="gap-6 px-4 pt-4">
+        contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 40 }}
+        contentContainerClassName="gap-6 px-4">
+        <ScreenHeader title={strings.addExpense.title} />
+
         <SchemaForm
           schema={addExpenseSchema}
           values={form.values}

@@ -64,11 +64,14 @@ export type DaySummary = {
 };
 
 /** The dashboard's time windows. */
-export const RANGE_IDS = ['d7', 'd30', 'd60', 'd180'] as const;
+export const RANGE_IDS = ['d1', 'd7', 'd30', 'd60', 'd180'] as const;
 
 export type RangeId = (typeof RANGE_IDS)[number];
 
 export const RANGE_LENGTHS: Record<RangeId, number> = {
+  // A single day. `dailyAverage` degenerates to the total here, which is why
+  // the dashboard swaps that tile for a yesterday comparison on this range.
+  d1: 1,
   d7: 7,
   d30: 30,
   d60: 60,

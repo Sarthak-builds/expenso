@@ -56,17 +56,21 @@ export const strings = {
     title: 'Dashboard',
     totalSpent: 'Total spent',
     dailyAverage: 'Daily average',
+    yesterday: 'Yesterday',
     entries: 'Entries',
+    rangeA11y: 'Time range',
     byCategory: 'By category',
     spendOverTime: 'Spend over time',
     recent: 'Recent',
     ranges: {
+      d1: 'Today',
       d7: '7d',
       d30: '30d',
       d60: '60d',
       d180: '180d',
     },
     rangeLabels: {
+      d1: 'Today',
       d7: 'Last 7 days',
       d30: 'Last 30 days',
       d60: 'Last 60 days',
@@ -124,6 +128,12 @@ export const strings = {
     placeholder: 'Add an expense or ask about your spending',
     send: 'Send',
     thinking: 'Thinking…',
+    clear: 'Clear',
+    clearTitle: 'Clear this conversation?',
+    clearBody: 'The messages go away. Your expenses are not affected.',
+    // Tapped straight into the composer. Two shapes, because the chat does two
+    // jobs and the empty state is the only place that can show both.
+    suggestions: ['Milk 30', 'How much this month?', 'Auto fare 45', 'Top spends last week'],
     confirmCard: {
       title: 'Add this expense?',
       confirm: 'Add expense',
