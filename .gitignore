@@ -46,3 +46,16 @@ yarn-error.*
 
 # local bundle smoke-test output
 .expo-export-test/
+
+# gstack — installed per-machine, deliberately NOT committed.
+#
+# 57 MB and 59 skills, most of them irrelevant here (iOS, Supabase, deploy,
+# browser automation). Committing it would put that in PUBLIC git history
+# permanently, since history cannot be trimmed without a force-push rewrite.
+# Its install-time scan also came back Gen "High Risk" / Socket 74 alerts,
+# which is not something to vendor into a repo under your name by default.
+#
+# Install it per-machine instead:  pnpm dlx skills add garrytan/gstack
+# Most of its skills also need Bun, which this project does not otherwise use.
+.agents/skills/gstack/
+.claude/skills/gstack/
