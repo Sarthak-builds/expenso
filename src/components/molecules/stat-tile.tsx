@@ -49,10 +49,18 @@ function StatTile({
   const rising = hasDelta && changeRatio > 0;
   const good = hasDelta && (rising ? goodDirection === 'up' : goodDirection === 'down');
 
+  // One spoken label for the tile. Four separate Texts read as disconnected
+  // fragments; "Daily average, 412 rupees, down 12%" reads as a sentence.
+  const spoken = [label, value, hasDelta ? percentFormatter.format(changeRatio) : null]
+    .filter(Boolean)
+    .join(', ');
+
   return (
     <View
+      accessible
+      accessibilityLabel={spoken}
       className={cn(
-        'flex-1 gap-2 rounded-lg border border-accents-2 bg-background p-4',
+        'flex-1 gap-1 rounded-lg border border-accents-2 bg-background p-3',
         className
       )}
       style={{ borderCurve: 'continuous' }}>

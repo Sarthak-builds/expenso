@@ -16,10 +16,25 @@ type SegmentedControlProps<T extends string> = {
   options: readonly SegmentedOption<T>[];
   value: T;
   onChange: (value: T) => void;
+  /**
+   * `sm` is for a control that qualifies the content rather than being the
+   * content — a dashboard range filter next to the figure it filters.
+   */
+  size?: 'default' | 'sm';
   /** Announced to screen readers as the group's purpose. */
   accessibilityLabel?: string;
   className?: string;
 };
+
+/**
+ * Visual height only. The TOUCH target is padded back up to 44pt with
+ * `hitSlop` below, so shrinking the control never shrinks what you have to
+ * hit — that is the trap with compact segmented controls.
+ */
+const SIZES = {
+  default: { segment: 'min-h-[36px] px-3 py-2', text: 'text-copy-14', slop: 4 },
+  sm: { segment: 'min-h-[28px] px-2 py-1', text: 'text-label-12', slop: 8 },
+} as const;
 
 /**
  * A row of mutually exclusive choices with a sliding indicator.
@@ -37,10 +52,12 @@ function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
+  size = 'default',
   accessibilityLabel,
   className,
 }: SegmentedControlProps<T>) {
   const [trackWidth, setTrackWidth] = React.useState(0);
+  const sizing = SIZES[size];
   const selectedIndex = Math.max(
     0,
     options.findIndex((option) => option.value === value)
@@ -84,10 +101,12 @@ function SegmentedControl<T extends string>({
             accessibilityRole="tab"
             accessibilityState={{ selected }}
             onPress={() => onChange(option.value)}
-            className="min-h-[36px] flex-1 items-center justify-center px-3 py-2">
+            hitSlop={sizing.slop}
+            className={cn('flex-1 items-center justify-center', sizing.segment)}>
             <Text
+              numberOfLines={1}
               className={cn(
-                'text-copy-14',
+                sizing.text,
                 selected ? 'font-medium text-foreground' : 'text-accents-5'
               )}>
               {option.label}

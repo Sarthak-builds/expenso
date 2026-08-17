@@ -1,56 +1,54 @@
 import { View } from 'react-native';
 
 import { Sparkline } from '@/components/charts';
-import { StatTile } from '@/components/molecules';
-import { Text } from '@/components/ui/text';
-import { formatMinorCompact, formatMinorWhole } from '@/lib/format';
+import { HeroStat, StatTile } from '@/components/molecules';
+import { formatMinorWhole } from '@/lib/format';
 import { strings } from '@/lib/strings';
 
 import type { RangeSummary } from '../model/types';
 import { useRangeTrend } from '../hooks/useRangeSummary';
 
 /**
- * The three figures at the top of the dashboard.
+ * The dashboard's figures, in priority order.
  *
- * Total is compact (`₹1.2L`) because it has to survive at `heading-24` inside a
- * half-width tile; the daily average is whole rupees because it is small enough
- * to read exactly. Neither shows paise — two decimals on a 180-day total is
- * four characters of noise.
+ * One hero and two qualifiers, rather than the three equal tiles this used to
+ * be. "How much have I spent" is the question the screen exists to answer, so
+ * the total gets `heading-72` and full width; the daily average and the entry
+ * count are context and sit underneath at `heading-24`.
  *
- * Domain-bound by design: it takes a `RangeSummary`, so it belongs to the
- * feature. `StatTile` and `Sparkline` underneath it take a string and a set of
- * points, and know nothing about money.
+ * The total is shown WHOLE rather than compact now that it has the width for
+ * it — `₹1,23,456` is more useful than `₹1.2L` when it is the one number you
+ * came to read, and it no longer has to survive inside a half-width tile.
  */
 export function SpendSummary({ summary }: { summary: RangeSummary }) {
-  const { changeRatio } = useRangeTrend();
+  const { changeRatio, previous } = useRangeTrend();
 
   const points = summary.daily.map((entry, index) => ({ x: index, y: entry.total }));
+  const isToday = summary.rangeId === 'd1';
 
   return (
-    <View className="gap-3">
-      <View className="flex-row gap-3">
-        <StatTile
-          label={strings.dashboard.totalSpent}
-          value={formatMinorCompact(summary.total)}
-          changeRatio={changeRatio}
-          goodDirection="down"
-        />
-        <StatTile
-          label={strings.dashboard.dailyAverage}
-          value={formatMinorWhole(summary.dailyAverage)}
-        />
-      </View>
+    <View className="gap-4">
+      <HeroStat
+        label={strings.dashboard.totalSpent}
+        value={formatMinorWhole(summary.total)}
+        changeRatio={changeRatio}
+        goodDirection="down"
+        caption={strings.dashboard.rangeLabels[summary.rangeId]}
+      />
 
-      <View
-        className="gap-2 rounded-lg border border-accents-2 bg-background p-4"
-        style={{ borderCurve: 'continuous' }}>
-        <View className="flex-row items-baseline justify-between">
-          <Text className="font-medium uppercase tracking-wider text-label-12 text-accents-5">
-            {strings.dashboard.entries}
-          </Text>
-          <Text className="font-mono-medium text-copy-14 text-foreground">{summary.count}</Text>
-        </View>
-        <Sparkline points={points} filled />
+      {/* One day is a single bar, which is not a trend — the sparkline only
+          earns its place once there is a shape to see. */}
+      {isToday ? null : <Sparkline points={points} filled height={40} />}
+
+      <View className="flex-row gap-3">
+        {/* On the Today range the daily average IS the total, so it would be
+            the hero figure repeated. Yesterday is the comparison that actually
+            tells you something on a single day. */}
+        <StatTile
+          label={isToday ? strings.dashboard.yesterday : strings.dashboard.dailyAverage}
+          value={formatMinorWhole(isToday ? previous : summary.dailyAverage)}
+        />
+        <StatTile label={strings.dashboard.entries} value={String(summary.count)} />
       </View>
     </View>
   );

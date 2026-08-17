@@ -5,8 +5,7 @@ import { Wallet } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { EmptyState, SectionHeader } from '@/components/molecules';
-import { Text } from '@/components/ui/text';
+import { EmptyState, ScreenHeader, SectionHeader } from '@/components/molecules';
 import { useRefreshControl } from '@/lib/hooks/use-refresh-control';
 import { strings } from '@/lib/strings';
 import { useThemeColors } from '@/lib/theme';
@@ -64,12 +63,9 @@ export function DashboardScreen() {
   // while scrolling, and rows need it to be the pressable surface's edge.
   const header = (
     <View className="gap-6 px-4 pb-2">
-      <View className="gap-4">
-        <Text className="font-bold text-heading-40 text-foreground">
-          {strings.dashboard.title}
-        </Text>
+      <ScreenHeader title={strings.dashboard.title}>
         <RangePicker />
-      </View>
+      </ScreenHeader>
 
       <SpendSummary summary={summary} />
       <SpendTrendChart summary={summary} />
@@ -97,7 +93,7 @@ export function DashboardScreen() {
           }}
         />
       }
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
+      contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 40 }}
       refreshControl={
         <RefreshControl
           {...refresh}
